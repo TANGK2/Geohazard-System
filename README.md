@@ -1,4 +1,4 @@
-# Geohazard-System
+### Geohazard-System
 # About me:
 Hi I am He Yulin. I'm a senior in the USM School of Computer Science, I major in software engineering and minor in mathematics.
 # My FYP: Geohazard System

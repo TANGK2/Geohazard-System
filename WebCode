@@ -132,9 +132,10 @@
             jsonData.forEach(function (row) {
                 var lat = row["Latitude"];
                 var lng = row["Longitude"];
+                var year = row["Year"];
                 var marker = L.marker([lng, lat], {
                     icon: customIcon
-                }).bindPopup("Flood!!!").addTo(map);
+                }).bindPopup("Flood Year:"+year).addTo(map);
 
             });
         };
@@ -176,9 +177,10 @@
             jsonData.forEach(function (row) {
                 var lat = row["Latitude"];
                 var lng = row["Longitude"];
+                var year = row["Year"];
                 var marker = L.marker([lng, lat], {
                     icon: landSlideIcon
-                }).bindPopup("Landslide!!!").addTo(map);
+                }).bindPopup("Landslide Year:"+year).addTo(map);
 
             });
         };

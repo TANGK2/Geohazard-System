@@ -86,30 +86,30 @@
         </div>
     </button>
     <div id="map"></div>
-    <script>
+    <script> //添加洪水标志
         // Set the initial coordinates to Malaysia
         var map = L.map('map').setView([3.14, 101.68], 13);
-    
+
         L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
             maxZoom: 18,
             subdomains: 'abcd'
         }).addTo(map);
-    
+
         // Read the Excel file and create markers on the map
         var customIcon = L.icon({
             iconUrl: 'flood.jpeg',
             iconSize: [50, 50],
             className: 'circle-border'
         });
-    
+
         var url = "flood.xlsx";
         var oReq = new XMLHttpRequest();
         oReq.open("GET", url, true);
         oReq.responseType = "arraybuffer";
         oReq.onload = function (e) {
             var arraybuffer = oReq.response;
-    
+
             // Convert data to binary string
             var data = new Uint8Array(arraybuffer);
             var arr = new Array();
@@ -117,16 +117,17 @@
                 arr[i] = String.fromCharCode(data[i]);
             }
             var bstr = arr.join("");
-    
+
             // Read Excel file
             var workbook = XLSX.read(bstr, {
                 type: "binary"
             });
-    
+
             // Get first sheet and convert to JSON
             var sheet_name_list = workbook.SheetNames;
             var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    
+
+
             // Create markers on the map
             jsonData.forEach(function (row) {
                 var lat = row["Latitude"];
@@ -139,7 +140,51 @@
         };
         oReq.send();
     </script>
-    
+    <script>//添加山崩标志
+        // Read the Excel file and create markers on the map
+        var landSlideIcon = L.icon({
+            iconUrl: 'landslide.jpeg',
+            iconSize: [50, 50],
+            className: 'circle-border'
+        });
+
+        var landSlideUrl = "landslide.xlsx";
+        var landSlideReq = new XMLHttpRequest();
+        landSlideReq.open("GET", landSlideUrl, true);
+        landSlideReq.responseType = "arraybuffer";
+        landSlideReq.onload = function (e) {
+            var arraybuffer = landSlideReq.response;
+
+            // Convert data to binary string
+            var data = new Uint8Array(arraybuffer);
+            var arr = new Array();
+            for (var i = 0; i != data.length; ++i) {
+                arr[i] = String.fromCharCode(data[i]);
+            }
+            var bstr = arr.join("");
+
+            // Read Excel file
+            var workbook = XLSX.read(bstr, {
+                type: "binary"
+            });
+
+            // Get first sheet and convert to JSON
+            var sheet_name_list = workbook.SheetNames;
+            var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+
+            // Create markers on the map
+            jsonData.forEach(function (row) {
+                var lat = row["Latitude"];
+                var lng = row["Longitude"];
+                var marker = L.marker([lng, lat], {
+                    icon: landSlideIcon
+                }).bindPopup("Landslide!!!").addTo(map);
+
+            });
+        };
+        landSlideReq.send();
+    </script>
+
 
 </body>
 

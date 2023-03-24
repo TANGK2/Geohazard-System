@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+    <script src="https://unpkg.com/xlsx@0.17.4/dist/xlsx.full.min.js"></script>
     <script src="Script.js"></script>
     <link rel="stylesheet" type="text/css" href="Styles.css">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+
+
     <style>
         #map {
             position: fixed;
-            bottom: 50px;
+            bottom: 30px;
             right: 100px;
             width: 800px;
             height: 800px;
@@ -21,8 +30,9 @@
             padding: 10px;
         }
     </style>
-    
-</head> 
+
+</head>
+
 <body>
     <div class="header">
         <button class="logo">
@@ -62,7 +72,7 @@
             <!-- Add more items as needed -->
         </div>
     </button>
-    
+
     <button class="dropdown1">
         Geological Disaster Type<div class="dropdown-content">
             <p>xxxx</p>
@@ -79,13 +89,58 @@
     <script>
         // Set the initial coordinates to Malaysia
         var map = L.map('map').setView([3.14, 101.68], 13);
-
+    
         L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
             maxZoom: 18,
             subdomains: 'abcd'
         }).addTo(map);
-    </script>
-</body>
-</html>
+    
+        // Read the Excel file and create markers on the map
+        var customIcon = L.icon({
+            iconUrl: 'flood.jpeg',
+            iconSize: [50, 50],
+            className: 'circle-border'
+        });
+    
+        var url = "flood.xlsx";
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", url, true);
+        oReq.responseType = "arraybuffer";
+        oReq.onload = function (e) {
+            var arraybuffer = oReq.response;
+    
+            // Convert data to binary string
+            var data = new Uint8Array(arraybuffer);
+            var arr = new Array();
+            for (var i = 0; i != data.length; ++i) {
+                arr[i] = String.fromCharCode(data[i]);
+            }
+            var bstr = arr.join("");
+    
+            // Read Excel file
+            var workbook = XLSX.read(bstr, {
+                type: "binary"
+            });
+    
+            // Get first sheet and convert to JSON
+            var sheet_name_list = workbook.SheetNames;
+            var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    
+            // Create markers on the map
+            jsonData.forEach(function (row) {
+                var lat = row["Latitude"];
+                var lng = row["Longitude"];
+                var marker = L.marker([lng, lat], {
+                    icon: customIcon
+                }).bindPopup("Flood!!!").addTo(map);
 
+            });
+        };
+        oReq.send();
+    </script>
+    
+
+</body>
+
+</html>

@@ -27,12 +27,12 @@
 
 <body>
     <div class="header">
-        <button class="logo">
-            Logo
-        </button>
-        <button class="lline geohazard-btn">
+        <div class="logo">
+            <img src="geologo.png" alt="Logo" />
+        </div>        
+        <div class="d2">
             Geohazard System
-        </button>
+        </div>
         <button class="lline">
             About Us
         </button>
@@ -48,7 +48,7 @@
     </div>
     <div class="mergin"></div>
     <form class="form1">
-        <input type="text" placeholder="Search...">
+        <input type="text" placeholder="Type the country here....">
         <button type="submit">Go</button>
     </form>
     <div class="button-container">
@@ -317,7 +317,17 @@ applyButton.addEventListener("click", function() {
   for (let i = 0; i < checkedCheckboxes.length; i++) {
     selectedGeologicalDisasters.push(checkedCheckboxes[i].value);
   }
+  // 在这里使用 selectedGeologicalDisasters 变量进行进一步处理
 });
+
       </script>
+
+
+
+  
+
+
+
 </body>
+
 </html>

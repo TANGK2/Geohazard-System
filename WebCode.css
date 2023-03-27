@@ -60,15 +60,7 @@
     height: 100px;
 }
 
-.logo {
-    position: relative;
-    top: 2%;
-    left: 5%;
-    display: inline-block;
-    width: 160px;
-    height: 50px;
-    z-index: 4;
-}
+
 
 .lline {
     position: relative;
@@ -208,11 +200,13 @@
 
 #map {
     position: fixed;
-    bottom: 30px;
+    bottom: 37px;
     right: 100px;
     width: 800px;
     height: 800px;
+    border-radius: 20px; /* 添加这一行来实现圆角效果 */
 }
+
 
 .header {
     background-color: black;
@@ -243,7 +237,6 @@ button:hover {
     position: relative;
 }
 
-.logo,
 .lline,
 .rline {
     position: relative;
@@ -275,7 +268,6 @@ button:hover {
 
 /* Add the following styles to your CSS file */
 
-.logo,
 .lline,
 .rline,
 .dropdown,
@@ -365,4 +357,27 @@ button:hover {
     background-color: #f2f2f2;
   }
   /* The Modal (background) */
- 
+  .logo {
+    /* ... other styles ... */
+
+    position: absolute;
+    top: -10px; /* Adjust the value to set the distance from the top */
+    left: 20px; /* Adjust the value to set the distance from the left */
+}
+
+.logo img {
+    width: 20%;
+    height: 20%;
+    object-fit: cover;
+}
+.d2{
+    color: white;
+    text-shadow:  
+    0px 0px 20px rgb(25, 218, 51),
+    0px 0px 10px orange,
+    0px 0px 10px rgb(56, 159, 219), 
+    0px 0px 10px rgb(238, 26, 26);
+    position: relative;
+    left: 06%;
+    font-size: 50px;
+}

@@ -28,20 +28,35 @@
     z-index: 3;
 }
 
-.dropdown-content {
+/* 按钮样式 */
+button.dropdown {
+    background-color: #b95050;
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 12px 16px;
+    font-size: 20px;
+    cursor: pointer;
+
+  }
+  
+  /* 下拉菜单内容样式 */
+  .dropdown-content {
     display: none;
     position: absolute;
     background-color: #b95050;
     min-width: 100px;
     z-index: 10;
-}
-
-.dropdown:hover .dropdown-content {
+    border-radius: 10px; /* 圆角 */
+  }
+  
+  /* 当鼠标移动到按钮上时显示下拉菜单 */
+  .dropdown:hover .dropdown-content {
     display: block;
-}
+  }
+  
 
 .mergin {
-    background-image: linear-gradient(to bottom, rgb(5, 5, 5) 0%, rgb(105, 102, 102) 100%);
+    background-image: linear-gradient(to bottom, rgb(5, 5, 5) 0%, rgb(14, 181, 247) 100%);
     /* Change the background color to a gradient of light grayish white */
     position: fixed;
     top: 0;
@@ -202,7 +217,7 @@
     position: fixed;
     bottom: 37px;
     right: 100px;
-    width: 800px;
+    width: 1200px;
     height: 800px;
     border-radius: 20px; /* 添加这一行来实现圆角效果 */
 }
@@ -219,7 +234,7 @@ button {
     border-radius: 20px;
     font-family: "Times New Roman", Times, serif;
     font-weight: bold;
-    background: linear-gradient(135deg, #474040 0%, #f8f4f4 100%);
+    background: linear-gradient(135deg, #313030 0%, #c7c5c5 100%);
     transition: background 0.3s;
 }
 
@@ -230,7 +245,7 @@ button:hover {
 /* Update the following existing styles in your CSS file */
 
 .header {
-    padding: 10px;
+    padding: 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -312,7 +327,7 @@ button:hover {
 }
 
 .dropdown, .dropdown1, .dropdown2 {
-    font-size: 16px; /* Increase the font size */
+    font-size: 20px; /* Increase the font size */
     /*padding: 16px 50px; /* Adjust the padding to increase the size */
     /* Add any other styles you need */
     text-align: center;
@@ -371,7 +386,7 @@ button:hover {
     object-fit: cover;
 }
 .d2{
-    color: white;
+    color: rgb(255, 255, 255);
     text-shadow:  
     0px 0px 20px rgb(25, 218, 51),
     0px 0px 10px orange,
@@ -380,4 +395,53 @@ button:hover {
     position: relative;
     left: 06%;
     font-size: 50px;
+}
+/* Add styles for the map-marker-container */
+.map-marker-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  
+  /* Add styles for the add-content-btn and view-content-btn */
+  .add-content-btn,
+  .view-content-btn {
+    position: absolute;
+    z-index: 100;
+  }
+  
+  .add-content-btn {
+    right: 60px;
+  }
+  
+  .view-content-btn {
+    right: 0;
+  }
+  
+  /* Update the existing modal style */
+
+  /* CSS for the marker popup */
+.leaflet-popup-content {
+    width: 350px;
+}
+
+.popup-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.popup-content {
+    flex: 1;
+}
+
+.popup-image {
+    max-width: 200px;
+    max-height: 200px;
+    margin-left: 10px;
+}
+
+.popup-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }

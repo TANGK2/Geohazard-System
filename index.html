@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.2/fetch.min.js"></script>
+    <script src="https://unpkg.com/xlsx@0.17.4/dist/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引用Bootstrap 5的CSS文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
+    <!-- 引用Bootstrap 5的JavaScript文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <script src="https://unpkg.com/localized-countries@2.0.2"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="geologo.png" alt="Logo" />
+        </div>
+        <div class="d2">
+            Geohazard System
+        </div>
+        <button class="lline" onclick="goToaboutPage()">
+            About Us
+        </button>
+        <script>
+            function goToaboutPage() {
+              window.location.href = "about.html";
+            }
+            </script>
+        <button class="lline" onclick="goTocontactPage()">
+            Contact Us
+        </button>
+        <script>
+            function goTocontactPage() {
+              window.location.href = "contact.html";
+            }
+            </script>
+        <button class="rline" onclick="goToLoginPage()">
+            Account
+          </button>
+          <script>
+          function goToLoginPage() {
+            window.location.href = "login.html";
+          }
+          </script>
+          
+    </div>
+    <div class="mergin"></div>
+    <form class="form1">
+        <input type="text" placeholder="Type the country here....">
+        <button type="submit">Go</button>
+    </form>
+    <div class="button-container">
+        <button class="dropdown" id="geologicalDisasterBtn">
+            Geo Data<div class="dropdown-content" id="geologicalDisasterContent">
+                <div class="geologicalDisasterItem">
+                    <img src="path/to/image1.jpg" alt="Image 1" class="geologicalDisasterImage">
+                    <p class="geologicalDisasterText">Image 1 description</p>
+                </div>
+                <div class="geologicalDisasterItem">
+                    <img src="path/to/image2.jpg" alt="Image 2" class="geologicalDisasterImage">
+                    <p class="geologicalDisasterText">Image 2 description</p>
+                </div>
+                <!-- Add more items as needed -->
+            </div>
+        </button>
+        <!-- Add an ID to the Geological Disaster Type button -->
+
+        <button class="dropdown1 button-custom" id="geologicalDisasterBtn">
+            Geo Type<div class="dropdown-content">
+                <p>xxxx</p>
+                <p>xxxx</p>
+            </div>
+        </button>
+        <button class="dropdown2 button-custom">
+            Region
+            <div class="dropdown-content">
+                <!-- Add more countries as needed -->
+            </div>
+        </button>
+    </div>
+    <div id="map"></div>
+    <script>
+        // --------------------------------------------------------------------------------------------------------------
+        // Set the initial coordinates to Malaysia
+        var map = L.map('map').setView([3.14, 101.68], 13);
+
+        // Add the Stamen terrain tile layer
+        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
+            maxZoom: 18,
+            subdomains: 'abcd'
+        }).addTo(map);
+
+        // Maintain an array of markers that have been added to the map
+        var markers = [];
+
+        // Add a click event listener to the map
+        map.on('click', function (e) {
+            // Check if any existing markers are within 10 pixels of the clicked location
+            var closeMarker = null;
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].getLatLng().distanceTo(e.latlng) < 10) {
+                    closeMarker = markers[i];
+                    break;
+                }
+            }
+
+            if (closeMarker) {
+                // If there is a close marker, open its existing popup
+                closeMarker.openPopup();
+            } else {
+                // Otherwise, create a new popup with a form for the user to input information
+                var popup = L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent('<form id="marker-form"><label for="title">Title:</label><br><input type="text" id="title" name="title" required><br><label for="content">Content:</label><br><textarea id="content" name="content" required></textarea><br><label for="media">Media:</label><br><input type="file" id="media" name="media"><br><button type="submit">Save</button></form>')
+                    .openOn(map);
+
+                // Add a submit event listener to the form
+                document.getElementById('marker-form').addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    // Get the values from the form
+                    var title = document.getElementById('title').value;
+                    var content = document.getElementById('content').value;
+                    var media = document.getElementById('media').files[0];
+
+                    // Convert URLs in the content field to links
+                    content = content.replace(/((https?|ftp):\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+                    // Create a marker at the clicked location
+                    var marker = L.marker(e.latlng).addTo(map);
+                    markers.push(marker); // Add the marker to the array of markers
+
+                    // Create a popup with information about the location and the user input
+                    var popup = L.popup()
+                        .setLatLng(e.latlng)
+                        .setContent('<h2>' + title + '</h2><p>' + content + '</p>' + (media ? '<img src="' + URL.createObjectURL(media) + '" class="popup-img" style="max-width: 300px; max-height: 300px;">' : ''))
+                        .openOn(map);
+
+                    // Bind the popup to the marker
+                    marker.bindPopup(popup);
+
+                    // Close the form popup
+                    popup.on('remove', function () {
+                        map.closePopup();
+                    });
+                    var popup = L.popup()
+                        .setLatLng(e.latlng)
+                        .setContent('<div class="popup-container"><div class="popup-content"><h2>' + title + '</h2><p>' + content + '</p></div>' + (media ? '<div class="popup-image"><img src="' + URL.createObjectURL(media) + '" class="popup-img"></div>' : '') + '</div>')
+                        .openOn(map);
+
+
+                    // Add a click event listener to the image element
+                    var img = popup._content.querySelector('.popup-img');
+                    if (img) {
+                        img.addEventListener('click', function () {
+                            // Create a new popup with the larger image
+                            var imgPopup = L.popup()
+                                .setLatLng(e.latlng)
+                                .setContent('<img src="' + URL.createObjectURL(media) + '" style="max-width: 400px; max-height: 400px;">')
+                                .openOn(map);
+
+                            // Remove the original popup
+                            map.removeLayer(popup);
+
+                            // Bind the new popup to the marker
+                            marker.bindPopup(imgPopup);
+
+                            // Close the new popup when the marker is clicked
+                            marker.on('click', function () {
+                                map.removeLayer(imgPopup);
+                            });
+                        });
+                    }
+                });
+            }
+        });
+
+
+//----------------------------------------------------------------------------------------------------------------------
+    </script>
+    <script>
+        // Read the Excel file and create markers on the map
+        var customIcon = L.icon({
+            iconUrl: 'flood.jpeg',
+            iconSize: [50, 50],
+            className: 'circle-border'
+        });
+        var url = "flood.xlsx";
+        var request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.responseType = "arraybuffer";
+        request.onload = function (e) {
+            var arraybuffer = request.response;
+
+            // Convert data to binary string
+            var data = new Uint8Array(arraybuffer);
+            var arr = new Array();
+            for (var i = 0; i != data.length; ++i) {
+                arr[i] = String.fromCharCode(data[i]);
+            }
+            var bstr = arr.join("");
+
+            // Read Excel file
+            var workbook = XLSX.read(bstr, {
+                type: "binary"
+            });
+
+            // Get first sheet and convert to JSON
+            var sheet_name_list = workbook.SheetNames;
+            var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+            // Create markers on the map
+            jsonData.forEach(function (row) {
+                var lat = row["Latitude"];
+                var lng = row["Longitude"];
+                var year = row["Year"];
+
+                // Replace this with the external video URL
+                var videoUrl = "12.mp4";
+
+
+                // Create a popup with a video player
+                var popupContent = `
+                <p>Flood Year: ${year}</p>
+                <video width="320" height="240" controls autoplay loop>
+                <source src="${videoUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            `;
+
+                var marker = L.marker([lng, lat], {
+                    icon: customIcon
+                }).bindPopup(popupContent).addTo(map);
+            });
+
+
+        };
+        request.send();
+    </script>
+
+
+    <script>
+        // Trigger the modal when the Add button is clicked
+        var addButton = document.getElementById('add-button');
+        var addModal = new bootstrap.Modal(document.getElementById('add-modal'));
+        addButton.addEventListener('click', function () {
+            addModal.show();
+        });
+
+        // Save the content when the Save button is clicked
+        function saveContent() {
+            // Get the title, content and image file from the form
+            var title = document.getElementById('add-modal-title').value;
+            var content = document.getElementById('add-modal-content').value;
+            var fileInput = document.getElementById('add-modal-image');
+            var imageFile = fileInput.files[0];
+
+            // Do something with the title, content and image file
+            // ...
+
+            // Close the modal after saving
+            addModal.hide();
+        }
+    </script>
+    <script>
+        // button add content
+        const addContentButton = document.getElementById('addContentButton');
+        const fileInput = document.getElementById('fileInput');
+
+        addContentButton.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            const file = fileInput.files[0];
+
+            // 可以根据文件类型进行不同的处理，如图片可以使用URL.createObjectURL()生成预览图
+
+            console.log('Uploaded file:', file);
+        });
+    </script>
+
+    <script>//添加山崩标志
+        // Read the Excel file and create markers on the map
+        var landSlideIcon = L.icon({
+            iconUrl: 'landslide.jpeg',
+            iconSize: [50, 50],
+            className: 'circle-border'
+        });
+
+        var landSlideUrl = "landslide.xlsx";
+        var landSlideReq = new XMLHttpRequest();
+        landSlideReq.open("GET", landSlideUrl, true);
+        landSlideReq.responseType = "arraybuffer";
+        landSlideReq.onload = function (e) {
+            var arraybuffer = landSlideReq.response;
+
+            // Convert data to binary string
+            var data = new Uint8Array(arraybuffer);
+            var arr = new Array();
+            for (var i = 0; i != data.length; ++i) {
+                arr[i] = String.fromCharCode(data[i]);
+            }
+            var bstr = arr.join("");
+
+            // Read Excel file
+            var workbook = XLSX.read(bstr, {
+                type: "binary"
+            });
+
+            // Get first sheet and convert to JSON
+            var sheet_name_list = workbook.SheetNames;
+            var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+
+            // Create markers on the map
+            jsonData.forEach(function (row) {
+                var lat = row["Latitude"];
+                var lng = row["Longitude"];
+                var year = row["Year"];
+                var marker = L.marker([lng, lat], {
+                    icon: landSlideIcon
+                }).bindPopup("Landslide Year:" + year).addTo(map);
+
+            });
+        };
+        landSlideReq.send();
+    </script>
+    <script>
+        fetch("https://restcountries.com/v3.1/all")
+            .then((response) => response.json())
+            .then((countries) => {
+
+                var countryDropdown = document.querySelector(".dropdown2 .dropdown-content");
+
+                // Sort countries by name
+                countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+                countries.forEach((country) => {
+                    var option = document.createElement("p");
+                    option.classList.add("country-option");
+                    option.textContent = country.name.common;
+                    option.setAttribute("data-lat", country.latlng[0]);
+                    option.setAttribute("data-lng", country.latlng[1]);
+                    countryDropdown.appendChild(option);
+                });
+
+                // Add event listeners to the country options
+                var countryOptions = document.querySelectorAll(".country-option");
+                countryOptions.forEach(function (option) {
+                    option.addEventListener("click", function () {
+                        var lat = parseFloat(this.getAttribute("data-lat"));
+                        var lng = parseFloat(this.getAttribute("data-lng"));
+                        map.setView([lat, lng], 6);
+                    });
+                });
+            });
+    </script>
+    <script>
+        const form = document.querySelector('.form1');
+        const input = form.querySelector('input[type="text"]');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevents the form from submitting and refreshing the page
+            const country = input.value.toLowerCase(); // Get the value of the input and convert to lowercase
+
+            // Find the coordinates of the country and center the map on it
+            fetch(`https://restcountries.com/v3.1/name/${country}?fullText=true`)
+                .then(response => response.json())
+                .then(countries => {
+                    if (countries.length > 0) { // If there is at least one matching country
+                        const lat = countries[0].latlng[0];
+                        const lng = countries[0].latlng[1];
+                        map.setView([lat, lng], 6); // Center the map on the country
+                    } else { // If there is no matching country
+                        alert(`No results found for ${country}. Please try again.`); // Show an error message
+                    }
+                })
+                .catch(error => {
+                    console.log(error); // Log any errors to the console
+                    alert(`An error occurred while searching for ${country}. Please try again.`); // Show an error message
+                });
+        });
+
+    </script>
+
+    <div id="country-list"></div>
+    <script>
+        // Get country list element
+        const countryList = document.querySelector('#country-list');
+
+        // Listen to input event on the search box
+        input.addEventListener('input', function () {
+            // Clear the country list
+            countryList.innerHTML = '';
+
+            // Get the input value
+            const inputValue = input.value.toLowerCase();
+
+            // If the input value is empty, do not display the country list
+            if (inputValue === '') {
+                return;
+            }
+
+            // Get all the country options
+            const countryOptions = document.querySelectorAll('.country-option');
+
+            // Loop through the country options and find the countries whose names start with the input value
+            countryOptions.forEach(function (option) {
+                const countryName = option.textContent.toLowerCase();
+                if (countryName.startsWith(inputValue)) {
+                    // If a matching country is found, add it to the country list
+                    const countryItem = document.createElement('p');
+                    countryItem.textContent = option.textContent;
+                    countryItem.classList.add('country-item');
+                    countryItem.setAttribute('data-lat', option.getAttribute('data-lat'));
+                    countryItem.setAttribute('data-lng', option.getAttribute('data-lng'));
+                    countryList.appendChild(countryItem);
+                }
+            });
+
+            // If the country list is not empty, display it
+            if (countryList.childElementCount > 0) {
+                countryList.style.display = 'block';
+            } else {
+                countryList.style.display = 'none';
+            }
+        });
+
+        // Listen to click event on the country options in the country list
+        countryList.addEventListener('click', function (event) {
+            const countryItem = event.target;
+            const lat = parseFloat(countryItem.getAttribute('data-lat'));
+            const lng = parseFloat(countryItem.getAttribute('data-lng'));
+            map.setView([lat, lng], 6);
+            // Clear the country list and hide it
+            countryList.innerHTML = '';
+            countryList.style.display = 'none';
+        });
+
+        const applyButton = document.querySelector("#applyButton");
+
+        applyButton.addEventListener("click", function () {
+            const checkedCheckboxes = document.querySelectorAll(".geologicalDisasterCheckbox:checked");
+            const selectedGeologicalDisasters = [];
+            for (let i = 0; i < checkedCheckboxes.length; i++) {
+                selectedGeologicalDisasters.push(checkedCheckboxes[i].value);
+            }
+            // 在这里使用 selectedGeologicalDisasters 变量进行进一步处理
+        });
+    </script>
+
+</body>
+
+</html>
